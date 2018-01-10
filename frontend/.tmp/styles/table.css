@@ -1,0 +1,19 @@
+tablex, th , td  {
+  border: 2px solid grey;
+  padding: 5px;
+  white-space: nowrap;
+}
+
+.borderfp {
+    border: 2px solid grey;
+}
+
+.scrollfp {
+  overflow-x: scroll;
+}
+
+.paddingfp {
+  padding: 10px;
+}
+
+/*# sourceMappingURL=table.css.map */

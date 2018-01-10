@@ -1,0 +1,39 @@
+<!-- Content Header (Page header) -->
+<section class="content-header animated fadeInUp">
+  <ol class="breadcrumb">
+    <li>
+      <a href="#dashboard">
+        <i class="fa fa-dashboard"></i> Início</a>
+    </li>
+    <li class="active">Dashboard</li>
+  </ol>
+</section>
+<br>
+<!-- Main content -->
+<section class="content animated fadeInUp">
+  <div class="painel painel-default">
+    <!-- Small boxes (Stat box) -->
+    <div class="row" ng-animate=" 'animate' ">
+      <div class="col-md-12">
+        <div class="input-group">
+          <h4>Upload on file select</h4>
+          <button ngf-select="uploadFiles($files, $invalidFiles)" multiple accept="*.pdf" ngf-max-height="30000" ngf-max-size="30MB">
+            Select Files</button>
+          <br>
+          <br> Files:
+          <ul>
+            <li ng-repeat="f in files" style="font:smaller">{{f.name}} {{f.$errorParam}}
+              <span class="progress" ng-show="f.progress >= 0">
+                <div style="width:{{f.progress}}%" ng-bind="f.progress + '%'"></div>
+              </span>
+            </li>
+            <li ng-repeat="f in errFiles" style="font:smaller">{{f.name}} {{f.$error}} {{f.$errorParam}}
+            </li>
+          </ul>
+          {{errorMsg}}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
