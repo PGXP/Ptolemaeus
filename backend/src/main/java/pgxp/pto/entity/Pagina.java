@@ -113,6 +113,8 @@ public class Pagina implements Serializable {
 
     @Override
     public String toString() {
-        return "Arquivo{" + "id=" + id + ", description=" + description + '}';
+        return "Pagina{" + "id=" + id + ", arquivo=" + arquivo + ", description=" + description + ", texto=" + texto + '}';
     }
+
+   
 }

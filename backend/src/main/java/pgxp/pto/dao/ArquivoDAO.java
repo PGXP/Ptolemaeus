@@ -1,11 +1,8 @@
 package pgxp.pto.dao;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,6 +14,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,8 +22,13 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.lucene.search.Sort;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.demoiselle.jee.crud.AbstractDAO;
 import org.hibernate.search.jpa.FullTextEntityManager;
@@ -74,9 +77,9 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
                 if (bytes.length > 0) {
                     // Cria o objeto do arquivo da conta
-                    Path file = Paths.get("/opt/appfiles/" + "doc/");
+                    Path file = Paths.get("/opt/appfiles/" + "ata/");
                     Files.createDirectories(file);
-                    file = Paths.get("/opt/appfiles/" + "doc/" + fileName);
+                    file = Paths.get("/opt/appfiles/" + "ata/" + fileName);
                     Files.write(file, bytes);
                     ler(fileName);
                 }
@@ -109,8 +112,9 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
             if (verifica(namefile)) {
                 PDDocument pd;
 
-                File input = new File("/opt/appfiles/" + "doc/" + namefile);  // The PDF file from where you would like to extract
+                File input = new File("/opt/appfiles/" + "ata/" + namefile);  // The PDF file from where you would like to extract
                 pd = PDDocument.load(input);
+
                 PDDocumentInformation info = pd.getDocumentInformation();
 
                 Arquivo arquivo = new Arquivo();
@@ -140,8 +144,17 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
                     stripper.setStartPage(i);
                     stripper.setEndPage(i);
                     pagina.setTexto(stripper.getText(pd));
+                    if (pagina.getTexto().isEmpty()) {
+                        PDResources pdResources = pd.getPage(i).getResources();
+                        for (COSName c : pdResources.getXObjectNames()) {
+                            PDXObject o = pdResources.getXObject(c);
+                            if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
+                                File file = new File("/opt/appfiles/img/" + arquivo + "-" + i + ".png");
+                                ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) o).getImage(), "png", file);
+                            }
+                        }
+                    }
                     paginaDAO.persist(pagina);
-
                 }
                 pd.close();
                 LOG.info(arquivo.getDescription() + " *********** PROCESSADO ************");
