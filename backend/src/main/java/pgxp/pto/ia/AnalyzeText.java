@@ -15,6 +15,8 @@
  */
 package pgxp.pto.ia;
 
+import com.google.api.gax.core.FixedCredentialsProvider;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.language.v1.AnalyzeEntitiesRequest;
 import com.google.cloud.language.v1.AnalyzeEntitiesResponse;
 import com.google.cloud.language.v1.AnalyzeEntitySentimentRequest;
@@ -31,8 +33,13 @@ import com.google.cloud.language.v1.EncodingType;
 import com.google.cloud.language.v1.Entity;
 import com.google.cloud.language.v1.EntityMention;
 import com.google.cloud.language.v1.LanguageServiceClient;
+import com.google.cloud.language.v1.LanguageServiceSettings;
 import com.google.cloud.language.v1.Sentiment;
 import com.google.cloud.language.v1.Token;
+import com.google.cloud.speech.v1.SpeechSettings;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
@@ -78,7 +85,7 @@ public class AnalyzeText {
             return response.getEntitiesList();
         }
         // [END analyze_entities_text]
-        
+
     }
 
     /**
@@ -104,15 +111,23 @@ public class AnalyzeText {
         }
         // [END analyze_sentiment_text]
     }
- 
 
     /**
      * from the string {@code text}.
      */
     public List<Token> analyzeSyntaxText(String text) throws Exception {
-        // [START analyze_syntax_text]
-        // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
-        try (LanguageServiceClient language = LanguageServiceClient.create()) {
+
+        Map<Float, String> resultado = new HashMap<>();
+        InputStream credentialsStream = new FileInputStream("/opt/demoiselle/google.json");
+        GoogleCredentials credentials = GoogleCredentials.fromStream(credentialsStream);
+        FixedCredentialsProvider credentialsProvider = FixedCredentialsProvider.create(credentials);
+
+        LanguageServiceSettings languageSettings
+                = LanguageServiceSettings.newBuilder()
+                        .setCredentialsProvider(credentialsProvider)
+                        .build();
+
+        try (LanguageServiceClient language = LanguageServiceClient.create(languageSettings)) {
             Document doc = Document.newBuilder()
                     .setContent(text)
                     .setType(Type.PLAIN_TEXT)
@@ -171,13 +186,13 @@ public class AnalyzeText {
                 System.out.printf("Category name : %s, Confidence : %.3f\n",
                         category.getName(), category.getConfidence());
             }
-            
+
             return response.getCategoriesList();
         }
         // [END classify_text]
-        
+
     }
- 
+
     /**
      * Detects the entity sentiments in the string {@code text} using the
      * Language Beta API.
@@ -209,7 +224,7 @@ public class AnalyzeText {
             return response.getEntitiesList();
         }
         // [END entity_sentiment_text]
-        
+
     }
 
 }

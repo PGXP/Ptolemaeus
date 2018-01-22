@@ -37,15 +37,7 @@ public class Timer {
     @Transactional
     @Schedule(second = "0", minute = "0", hour = "*/1", persistent = false)
     public void atSchedule1h() {
-        List<Fingerprint> fps = (List<Fingerprint>) fingerprintDAO.find().getContent();
 
-        fps.stream().filter((fp) -> (fp.getCodigo().contains("send"))).map((fp) -> {
-            sender.send(fp.getCodigo().split("send/")[1], "Sistema atualizado");
-            return fp;
-        }).forEachOrdered((fp) -> {
-            fingerprintDAO.remove(fp.getId());
-            LOG.info(fp.getUsuario() + " apagado ");
-        });
     }
 
     /**
@@ -62,7 +54,7 @@ public class Timer {
      */
     @Startup
     public void atNow() {
-       
+
     }
 
     /**
