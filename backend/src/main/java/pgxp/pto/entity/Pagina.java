@@ -46,6 +46,10 @@ public class Pagina implements Serializable {
     @JoinColumn
     private Arquivo arquivo;
 
+    @ManyToOne
+    @JoinColumn
+    private Entidades entidades;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
@@ -89,6 +93,14 @@ public class Pagina implements Serializable {
         this.texto = texto;
     }
 
+    public Entidades getEntidades() {
+        return entidades;
+    }
+
+    public void setEntidades(Entidades entidades) {
+        this.entidades = entidades;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
@@ -116,5 +128,4 @@ public class Pagina implements Serializable {
         return "Pagina{" + "id=" + id + ", arquivo=" + arquivo + ", description=" + description + ", texto=" + texto + '}';
     }
 
-   
 }

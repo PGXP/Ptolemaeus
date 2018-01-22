@@ -3,10 +3,12 @@ package pgxp.pto.dao;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import pgxp.pto.entity.Arquivo;
@@ -14,6 +16,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -25,11 +28,10 @@ import org.apache.lucene.search.Sort;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.demoiselle.jee.core.lifecycle.annotation.Startup;
 import org.demoiselle.jee.crud.AbstractDAO;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -38,7 +40,10 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import pgxp.pto.constants.ResponseFTS;
+import pgxp.pto.entity.Entidades;
 import pgxp.pto.entity.Pagina;
+import pgxp.pto.ia.AudioToText;
+import pgxp.pto.ia.NLPtools;
 
 public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
@@ -46,6 +51,15 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
     @Inject
     private PaginaDAO paginaDAO;
+
+    @Inject
+    private EntidadesDAO entidadesDAO;
+
+    @Inject
+    private AudioToText att;
+
+    @Inject
+    private NLPtools nlp;
 
     @PersistenceContext(unitName = "ptoPU")
     protected EntityManager em;
@@ -77,9 +91,9 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
                 if (bytes.length > 0) {
                     // Cria o objeto do arquivo da conta
-                    Path file = Paths.get("/opt/appfiles/" + "ata/");
+                    Path file = Paths.get("/opt/appfiles/" + "livros/");
                     Files.createDirectories(file);
-                    file = Paths.get("/opt/appfiles/" + "ata/" + fileName);
+                    file = Paths.get("/opt/appfiles/" + "livros/" + fileName);
                     Files.write(file, bytes);
                     ler(fileName);
                 }
@@ -106,13 +120,13 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
     }
 
     private void ler(String namefile) {
-
+        LOG.log(Level.INFO, "{0} *********** Inicio ************", namefile);
         try {
 
             if (verifica(namefile)) {
                 PDDocument pd;
 
-                File input = new File("/opt/appfiles/" + "ata/" + namefile);  // The PDF file from where you would like to extract
+                File input = new File("/opt/appfiles/" + "livros/" + namefile);  // The PDF file from where you would like to extract
                 pd = PDDocument.load(input);
 
                 PDDocumentInformation info = pd.getDocumentInformation();
@@ -143,24 +157,29 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
                     PDFTextStripper stripper = new PDFTextStripper();
                     stripper.setStartPage(i);
                     stripper.setEndPage(i);
-                    pagina.setTexto(stripper.getText(pd));
-                    if (pagina.getTexto().isEmpty()) {
-                        PDResources pdResources = pd.getPage(i).getResources();
-                        for (COSName c : pdResources.getXObjectNames()) {
-                            PDXObject o = pdResources.getXObject(c);
-                            if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
-                                File file = new File("/opt/appfiles/img/" + arquivo + "-" + i + ".png");
-                                ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) o).getImage(), "png", file);
-                            }
-                        }
-                    }
+                    String texto = stripper.getText(pd);
+                    pagina.setTexto(texto);
+                    Entidades ents = new Entidades(nlp.persons(texto));
+
+//                    PDResources pdResources = pd.getPage(i).getResources();
+//                    for (COSName c : pdResources.getXObjectNames()) {
+//                        PDXObject o = pdResources.getXObject(c);
+//                        if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
+//                            File file = new File("/opt/appfiles/img/" + arquivo + "-" + i + ".png");
+//                            ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) o).getImage(), "png", file);
+//                        }
+//                    }
+
+                    ents = entidadesDAO.persist(ents);
+                    pagina.setEntidades(ents);
                     paginaDAO.persist(pagina);
+                    
                 }
                 pd.close();
-                LOG.info(arquivo.getDescription() + " *********** PROCESSADO ************");
+                LOG.log(Level.INFO, "{0} *********** PROCESSADO ************", arquivo.getDescription());
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -185,13 +204,11 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
             luceneQuery = qb.phrase()
                     .onField("description")
                     .andField("texto").boostedTo(2)
-                    .andField("arquivo.description")
                     .sentence(nome).createQuery();
         } else {
             luceneQuery = qb.keyword()
                     .onField("description")
                     .andField("texto").boostedTo(2)
-                    .andField("arquivo.description")
                     .matching(nome).createQuery();
         }
 
@@ -203,15 +220,12 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
                 StringBuilder sb = new StringBuilder();
                 Float score = (Float) ((Object[]) object)[0];
                 Pagina pagina = (Pagina) ((Object[]) object)[1];
-                ResponseFTS fts = new ResponseFTS();
-                fts.setIdOrigem(pagina.getArquivo().getId().toString());
-                fts.setOrigem(pagina.getArquivo().getDescription());
-                fts.setNome(pagina.getDescription());
-                fts.setOcorrencias(score);
-
-                fts.setTexto(pagina.getTexto());
-
-                lista.add(fts);
+                if (pagina != null) {
+                    ResponseFTS fts = new ResponseFTS();
+                    fts.setPagina(pagina);
+                    fts.setOcorrencias(score);
+                    lista.add(fts);
+                }
             } catch (Exception ex) {
                 Logger.getLogger(ArquivoDAO.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -220,6 +234,38 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
         return lista;
 
+    }
+
+    public Map<String, Map<Float, String>> audioToText(String filename) {
+        Map<String, Map<Float, String>> resultado = new HashMap<>();
+        try {
+
+            File folder = new File(filename);
+            File[] listOfFiles = folder.listFiles();
+
+            for (File file : listOfFiles) {
+                if (file.isFile()) {
+                    Map<Float, String> temp = att.syncRecognizeFile(file.getAbsolutePath());
+                    resultado.put(file.getName(), temp);
+                    LOG.info(file.getAbsolutePath());
+                }
+            }
+
+            try (PrintWriter out = new PrintWriter("/opt/audio/flac/transcricao.txt")) {
+                for (Map.Entry<String, Map<Float, String>> entry : resultado.entrySet()) {
+                    out.println("file: " + entry.getKey() + " --------------------------------------");
+                    for (Map.Entry<Float, String> entryr : entry.getValue().entrySet()) {
+                        out.println("acert: " + entryr.getKey() + "---------------");
+                        out.println(entryr.getValue());
+                    }
+
+                }
+            }
+
+        } catch (Exception ex) {
+            Logger.getLogger(ArquivoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return resultado;
     }
 
     public void reindex() {
@@ -236,55 +282,5 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         List<Arquivo> lista = getEntityManager().createQuery("Select a from Arquivo a where a.description = :desc", Arquivo.class).setParameter("desc", description).getResultList();
         return lista.isEmpty();
     }
+
 }
-
-//    private void addContent(Document document, InputStream is, String documentLocation) throws IOException
-//	    {
-//	        try (PDDocument pdfDocument = PDDocument.load(is))
-//	        {
-//	            // create a writer where to append the text content.
-//	            StringWriter writer = new StringWriter();
-//	            if (stripper == null)
-//	            {
-//	                stripper = new PDFTextStripper();
-//	            }
-//	            stripper.writeText(pdfDocument, writer);
-//	
-//	            // Note: the buffer to string operation is costless;
-//	            // the char array value of the writer buffer and the content string
-//	            // is shared as long as the buffer content is not modified, which will
-//	            // not occur here.
-//	            String contents = writer.getBuffer().toString();
-//	
-//	            StringReader reader = new StringReader(contents);
-//	
-//	            // Add the tag-stripped contents as a Reader-valued Text field so it will
-//	            // get tokenized and indexed.
-//	            addTextField(document, "contents", reader);
-//	
-//	            PDDocumentInformation info = pdfDocument.getDocumentInformation();
-//	            if (info != null)
-//	            {
-//	                addTextField(document, "Author", info.getAuthor());
-//	                addTextField(document, "CreationDate", info.getCreationDate());
-//	                addTextField(document, "Creator", info.getCreator());
-//	                addTextField(document, "Keywords", info.getKeywords());
-//	                addTextField(document, "ModificationDate", info.getModificationDate());
-//	                addTextField(document, "Producer", info.getProducer());
-//	                addTextField(document, "Subject", info.getSubject());
-//	                addTextField(document, "Title", info.getTitle());
-//	                addTextField(document, "Trapped", info.getTrapped());
-//	            }
-//	            int summarySize = Math.min(contents.length(), 500);
-//	            String summary = contents.substring(0, summarySize);
-//	            // Add the summary as an UnIndexed field, so that it is stored and returned
-//	            // with hit documents for display.
-//	            addUnindexedField(document, "summary", summary);
-//	        }
-//	        catch (InvalidPasswordException e)
-//	        {
-//	            // they didn't suppply a password and the default of "" was wrong.
-//	            throw new IOException("Error: The document(" + documentLocation + ") is encrypted and will not be indexed.", e);
-//	        }
-//	    }
-

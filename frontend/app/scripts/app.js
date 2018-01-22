@@ -22,10 +22,6 @@ var app = angular
     '$httpProvider',
     'USER_ROLES',
     function($routeProvider, USER_ROLES) {
-      $routeProvider.otherwise({
-        redirectTo: '/dashboard',
-        data: { authorizedRoles: [USER_ROLES.NOT_LOGGED] }
-      });
 
       $routeProvider.when('/403', {
         templateUrl: 'views/403.html',
@@ -44,9 +40,14 @@ var app = angular
         data: { authorizedRoles: [USER_ROLES.NOT_LOGGED] }
       });
 
-      $routeProvider.when('/', {
+      $routeProvider.when('/dashboard', {
         templateUrl: 'views/dashboard/dashboard.html',
         controller: 'DashboardController',
+        data: { authorizedRoles: [USER_ROLES.NOT_LOGGED] }
+      });
+
+      $routeProvider.otherwise({
+        redirectTo: '/dashboard',
         data: { authorizedRoles: [USER_ROLES.NOT_LOGGED] }
       });
     }

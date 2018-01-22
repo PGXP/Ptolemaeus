@@ -7,6 +7,7 @@
     <class>pgxp.pto.entity.Fingerprint</class>
     <class>pgxp.pto.entity.Arquivo</class>
     <class>pgxp.pto.entity.Pagina</class>
+    <class>pgxp.pto.entity.Entidades</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>

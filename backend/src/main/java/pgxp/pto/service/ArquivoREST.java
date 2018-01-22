@@ -5,6 +5,7 @@ import java.util.UUID;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import javax.ejb.Asynchronous;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -21,6 +22,7 @@ import org.demoiselle.jee.crud.Search;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import pgxp.pto.bc.ArquivoBC;
 
+@Asynchronous
 @Api("v1/Arquivos")
 @Path("v1/arquivos")
 public class ArquivoREST extends AbstractREST< Arquivo, UUID> {
@@ -67,6 +69,21 @@ public class ArquivoREST extends AbstractREST< Arquivo, UUID> {
     @Produces("application/force-download")
     public Response download(@PathParam("id") Long id) {
         return Response.ok().build();
+//        final ByteArrayInputStream in = new ByteArrayInputStream(anexo.getArquivo());
+//        return Response.ok(in, MediaType.APPLICATION_OCTET_STREAM)
+//            .header("content-disposition", "attachment; filename = '" + anexo.getNomeArquivo() + "'").build();
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @GET
+    @Path("audio")
+    @Transactional
+    public Response audio() {
+        return Response.ok().entity(((ArquivoBC) bc).audioToText("/opt/audio/flac")).build();
 //        final ByteArrayInputStream in = new ByteArrayInputStream(anexo.getArquivo());
 //        return Response.ok(in, MediaType.APPLICATION_OCTET_STREAM)
 //            .header("content-disposition", "attachment; filename = '" + anexo.getNomeArquivo() + "'").build();
