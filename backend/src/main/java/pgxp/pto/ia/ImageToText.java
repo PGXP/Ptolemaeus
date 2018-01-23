@@ -41,21 +41,20 @@ public class ImageToText {
 
     public String syncRecognizeFile(String fileName) throws Exception, IOException {
 
-        String resultado = "";
+        StringBuilder resultado = new StringBuilder();
         InputStream credentialsStream = new FileInputStream("/opt/demoiselle/google.json");
         GoogleCredentials credentials = GoogleCredentials.fromStream(credentialsStream);
         FixedCredentialsProvider credentialsProvider = FixedCredentialsProvider.create(credentials);
 
-          ImageAnnotatorSettings annotatorSettings
+        ImageAnnotatorSettings annotatorSettings
                 = ImageAnnotatorSettings.newBuilder()
                         .setCredentialsProvider(credentialsProvider)
                         .build();
-        
+
         try (ImageAnnotatorClient vision = ImageAnnotatorClient.create(annotatorSettings)) {
 
             // The path to the image file to annotate
             //String fileName = "./resources/wakeupcat.jpg";
-
             // Reads the image file into memory
             Path path = Paths.get(fileName);
             byte[] data = Files.readAllBytes(path);
@@ -76,18 +75,11 @@ public class ImageToText {
             List<AnnotateImageResponse> responses = response.getResponsesList();
 
             for (AnnotateImageResponse res : responses) {
-                if (res.hasError()) {
-                    System.out.printf("Error: %s\n", res.getError().getMessage());
-                    return null;
-                }
-
-                for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
-                    annotation.getAllFields().forEach((k, v)
-                            -> System.out.printf("%s : %s\n", k, v.toString()));
-                }
+                resultado.append(res.getFullTextAnnotation().getText()).append(" \n ");
             }
         }
-        return null;
+
+        return resultado.toString();
     }
 
 }

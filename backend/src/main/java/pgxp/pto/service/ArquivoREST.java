@@ -5,6 +5,7 @@ import java.util.UUID;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import java.util.concurrent.ExecutorService;
 import javax.ejb.Asynchronous;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -13,6 +14,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import javax.ws.rs.core.Response;
@@ -35,57 +38,42 @@ public class ArquivoREST extends AbstractREST< Arquivo, UUID> {
         return bc.find();
     }
 
-    @GET
+    @POST
+    @Path(value = "upload")
     @Transactional
-    @Path("fts/{term}")
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    public Response findFts(@PathParam("term") String texto) {
-        return Response.ok().entity(((ArquivoBC) bc).listarFTS(texto)).build();
+    @Consumes(value = MediaType.MULTIPART_FORM_DATA)
+    public void salvarAnexo(@Suspended final AsyncResponse asyncResponse, final MultipartFormDataInput input) {
+        asyncResponse.resume(doSalvarAnexo(input));
     }
 
-    /**
-     *
-     * @param input
-     * @return
-     */
-    @POST
-    @Path("upload")
-    @Transactional
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response salvarAnexo(MultipartFormDataInput input) {
+    private Response doSalvarAnexo(MultipartFormDataInput input) {
         ((ArquivoBC) bc).salvarAnexo(input);
         return Response.ok().build();
     }
 
-    /**
-     *
-     * @param id
-     * @return
-     */
     @GET
-    @Path("download/{id}")
     @Transactional
-    @Produces("application/force-download")
-    public Response download(@PathParam("id") Long id) {
-        return Response.ok().build();
-//        final ByteArrayInputStream in = new ByteArrayInputStream(anexo.getArquivo());
-//        return Response.ok(in, MediaType.APPLICATION_OCTET_STREAM)
-//            .header("content-disposition", "attachment; filename = '" + anexo.getNomeArquivo() + "'").build();
+    @Path(value = "fts/{term}")
+    @Consumes(value = APPLICATION_JSON)
+    @Produces(value = APPLICATION_JSON)
+    public void findFts(@Suspended final AsyncResponse asyncResponse, @PathParam(value = "term") final String texto) {
+        asyncResponse.resume(doFindFts(texto));
     }
 
-    /**
-     *
-     * @param id
-     * @return
-     */
-    @GET
-    @Path("audio")
-    @Transactional
-    public Response audio() {
-        return Response.ok().entity(((ArquivoBC) bc).audioToText("/opt/audio/flac")).build();
-//        final ByteArrayInputStream in = new ByteArrayInputStream(anexo.getArquivo());
-//        return Response.ok(in, MediaType.APPLICATION_OCTET_STREAM)
-//            .header("content-disposition", "attachment; filename = '" + anexo.getNomeArquivo() + "'").build();
+    private Response doFindFts(@PathParam("term") String texto) {
+        return Response.ok().entity(((ArquivoBC) bc).listarFTS(texto)).build();
     }
+
+    @GET
+    @Path(value = "download/{id}")
+    @Transactional
+    @Produces(value = "application/force-download")
+    public void download(@Suspended final AsyncResponse asyncResponse, @PathParam(value = "id") final Long id) {
+        asyncResponse.resume(doDownload(id));
+    }
+
+    private Response doDownload(@PathParam("id") Long id) {
+        return Response.ok().build();
+    }
+
 }

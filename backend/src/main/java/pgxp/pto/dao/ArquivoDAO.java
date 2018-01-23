@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.MultivaluedMap;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.lucene.search.Sort;
 import org.apache.pdfbox.cos.COSName;
@@ -43,6 +44,7 @@ import pgxp.pto.constants.ResponseFTS;
 import pgxp.pto.entity.Entidades;
 import pgxp.pto.entity.Pagina;
 import pgxp.pto.ia.AudioToText;
+import pgxp.pto.ia.ImageToText;
 import pgxp.pto.ia.NLPtools;
 
 public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
@@ -56,7 +58,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
     private EntidadesDAO entidadesDAO;
 
     @Inject
-    private AudioToText att;
+    private ImageToText itt;
 
     @Inject
     private NLPtools nlp;
@@ -158,22 +160,24 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
                     stripper.setStartPage(i);
                     stripper.setEndPage(i);
                     String texto = stripper.getText(pd);
+
+                    PDResources pdResources = pd.getPage(i).getResources();
+                    for (COSName c : pdResources.getXObjectNames()) {
+                        PDXObject o = pdResources.getXObject(c);
+                        if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
+                            File file = new File("/opt/appfiles/img/" + namefile + "-" + i + ".png");
+                            ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) o).getImage(), "png", file);
+                            texto = texto + " " + itt.syncRecognizeFile("/opt/appfiles/img/" + namefile + "-" + i + ".png");
+                            FileUtils.write(new File("/opt/appfiles/img/" + namefile + "-" + i + ".txt"), texto);
+                        }
+                    }
+
                     pagina.setTexto(texto);
                     Entidades ents = new Entidades(nlp.persons(texto));
-
-//                    PDResources pdResources = pd.getPage(i).getResources();
-//                    for (COSName c : pdResources.getXObjectNames()) {
-//                        PDXObject o = pdResources.getXObject(c);
-//                        if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
-//                            File file = new File("/opt/appfiles/img/" + arquivo + "-" + i + ".png");
-//                            ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) o).getImage(), "png", file);
-//                        }
-//                    }
-
                     ents = entidadesDAO.persist(ents);
                     pagina.setEntidades(ents);
                     paginaDAO.persist(pagina);
-                    
+
                 }
                 pd.close();
                 LOG.log(Level.INFO, "{0} *********** PROCESSADO ************", arquivo.getDescription());
@@ -181,6 +185,8 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(ArquivoDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -234,38 +240,6 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
         return lista;
 
-    }
-
-    public Map<String, Map<Float, String>> audioToText(String filename) {
-        Map<String, Map<Float, String>> resultado = new HashMap<>();
-        try {
-
-            File folder = new File(filename);
-            File[] listOfFiles = folder.listFiles();
-
-            for (File file : listOfFiles) {
-                if (file.isFile()) {
-                    Map<Float, String> temp = att.syncRecognizeFile(file.getAbsolutePath());
-                    resultado.put(file.getName(), temp);
-                    LOG.info(file.getAbsolutePath());
-                }
-            }
-
-            try (PrintWriter out = new PrintWriter("/opt/audio/flac/transcricao.txt")) {
-                for (Map.Entry<String, Map<Float, String>> entry : resultado.entrySet()) {
-                    out.println("file: " + entry.getKey() + " --------------------------------------");
-                    for (Map.Entry<Float, String> entryr : entry.getValue().entrySet()) {
-                        out.println("acert: " + entryr.getKey() + "---------------");
-                        out.println(entryr.getValue());
-                    }
-
-                }
-            }
-
-        } catch (Exception ex) {
-            Logger.getLogger(ArquivoDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return resultado;
     }
 
     public void reindex() {

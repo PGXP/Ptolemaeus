@@ -19,8 +19,4 @@ public class ArquivoBC extends AbstractBusiness< Arquivo, UUID> {
         return ((ArquivoDAO) dao).listarFTS(nome);
     }
 
-    public Map<String, Map<Float, String>> audioToText(String filename) {
-        return ((ArquivoDAO) dao).audioToText(filename);
-    }
-
 }
