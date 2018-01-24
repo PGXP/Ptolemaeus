@@ -154,8 +154,8 @@
         <!-- Search -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
-            <version>5.8.2.Final</version>
+            <artifactId>hibernate-search</artifactId>
+            <version>4.5.3.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -163,9 +163,9 @@
             <version>4.5.3.Final</version>
         </dependency>
         <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-directory-provider</artifactId>
-            <version>9.0.1.Final</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-infinispan</artifactId>
+            <version>4.5.3.Final</version>
         </dependency>
         <dependency>
             <groupId>org.apache.opennlp</groupId>
@@ -220,8 +220,7 @@
         </dependency>
 
         <!-- [END dependencies] -->
-        
-        
+
     </dependencies>
 
 </project>

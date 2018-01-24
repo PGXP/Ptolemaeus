@@ -58,11 +58,11 @@ app.config([
   '$websocketProvider',
   '$sceDelegateProvider',
   function($httpProvider, $websocketProvider, $sceDelegateProvider) {
-    $websocketProvider.$setup({
-      reconnect: true,
-      reconnectInterval: 21000,
-      enqueue: true
-    });
+    // $websocketProvider.$setup({
+    //   reconnect: true,
+    //   reconnectInterval: 21000,
+    //   enqueue: true
+    // });
 
     $sceDelegateProvider.resourceUrlWhitelist(['self']);
 

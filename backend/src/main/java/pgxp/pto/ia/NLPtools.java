@@ -42,7 +42,7 @@ public class NLPtools {
     public Map<String, String> persons(String texto) {
         Map<String, String> resultado = new HashMap<>();
 
-        try (InputStream modelPerson = new FileInputStream(pasta + "pt-ner-amazonia.bin")) {
+        try (InputStream modelPerson = new FileInputStream(pasta + "pt-ner-selva-lit.bin")) {
 
             String tokens[] = tokenizer(texto).toArray(new String[tokenizer(texto).size()]);
             TokenNameFinderModel model = new TokenNameFinderModel(modelPerson);

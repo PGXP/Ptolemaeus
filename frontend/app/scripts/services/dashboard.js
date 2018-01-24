@@ -1,20 +1,16 @@
 'use strict';
 
-var backendUrl = '';
-
-app.factory('DashboardService', ['$http', function ($http) {
-
+app.factory('DashboardService', [
+  '$http',
+  function($http) {
     var service = {};
 
-    service.get = function () {
-        return $http
-                .get('api/tema', {cache: true})
-                .then(function (res) {
-                    return res.data;
-                });
+    service.get = function() {
+      return $http.get('api/v1').then(function(res) {
+        return res.data;
+      });
     };
 
-
     return service;
-}]);
-
+  }
+]);

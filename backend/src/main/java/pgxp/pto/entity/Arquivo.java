@@ -47,37 +47,6 @@ public class Arquivo implements Serializable {
     @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
     private String description;
 
-    @Column(nullable = false, length = 128)
-    private String pasta;
-
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String author;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String creationDate;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String creator;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String keywords;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String modificationDate;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String producer;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String subject;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String title;
-    @Column(length = 128)
-    @Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
-    private String trapped;
-
     public UUID getId() {
         return id;
     }
@@ -92,86 +61,6 @@ public class Arquivo implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getPasta() {
-        return pasta;
-    }
-
-    public void setPasta(String pasta) {
-        this.pasta = pasta;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
-    }
-
-    public String getModificationDate() {
-        return modificationDate;
-    }
-
-    public void setModificationDate(String modificationDate) {
-        this.modificationDate = modificationDate;
-    }
-
-    public String getProducer() {
-        return producer;
-    }
-
-    public void setProducer(String producer) {
-        this.producer = producer;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getTrapped() {
-        return trapped;
-    }
-
-    public void setTrapped(String trapped) {
-        this.trapped = trapped;
     }
 
     @Override
@@ -198,7 +87,7 @@ public class Arquivo implements Serializable {
 
     @Override
     public String toString() {
-        return "Arquivo{" + "id=" + id + ", description=" + description + ", pasta=" + pasta + ", author=" + author + ", creationDate=" + creationDate + ", creator=" + creator + ", keywords=" + keywords + ", modificationDate=" + modificationDate + ", producer=" + producer + ", subject=" + subject + ", title=" + title + ", trapped=" + trapped + '}';
+        return "Arquivo{" + "id=" + id + ", description=" + description + '}';
     }
 
 }

@@ -1,14 +1,9 @@
 package pgxp.pto.dao;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import pgxp.pto.entity.Arquivo;
@@ -16,23 +11,20 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
-import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.MultivaluedMap;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.lucene.search.Sort;
+
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.demoiselle.jee.core.lifecycle.annotation.Startup;
 import org.demoiselle.jee.crud.AbstractDAO;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -43,7 +35,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import pgxp.pto.constants.ResponseFTS;
 import pgxp.pto.entity.Entidades;
 import pgxp.pto.entity.Pagina;
-import pgxp.pto.ia.AudioToText;
 import pgxp.pto.ia.ImageToText;
 import pgxp.pto.ia.NLPtools;
 
@@ -89,16 +80,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
                 InputStream inputStream = inputPart.getBody(InputStream.class, null);
 
-                byte[] bytes = IOUtils.toByteArray(inputStream);
-
-                if (bytes.length > 0) {
-                    // Cria o objeto do arquivo da conta
-                    Path file = Paths.get("/opt/appfiles/" + "livros/");
-                    Files.createDirectories(file);
-                    file = Paths.get("/opt/appfiles/" + "livros/" + fileName);
-                    Files.write(file, bytes);
-                    ler(fileName);
-                }
+                ler(inputStream, fileName);
 
             } catch (IOException e) {
                 throw new InternalServerErrorException(
@@ -121,37 +103,18 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         return "unknown";
     }
 
-    private void ler(String namefile) {
-        LOG.log(Level.INFO, "{0} *********** Inicio ************", namefile);
+    private void ler(InputStream inputStream, String namefile) {
+
         try {
-
             if (verifica(namefile)) {
+                LOG.log(Level.INFO, "{0} *********** Inicio ************", namefile);
                 PDDocument pd;
-
-                File input = new File("/opt/appfiles/" + "livros/" + namefile);  // The PDF file from where you would like to extract
-                pd = PDDocument.load(input);
-
-                PDDocumentInformation info = pd.getDocumentInformation();
-
+                pd = PDDocument.load(inputStream);
                 Arquivo arquivo = new Arquivo();
                 arquivo.setDescription(namefile);
-                arquivo.setPasta("/opt/appfiles/" + "doc/");
-
-                if (info != null) {
-                    arquivo.setAuthor(info.getAuthor());
-//                    arquivo.setCreationDate(info.getCreationDate().toString());
-                    arquivo.setCreator(info.getCreator());
-                    arquivo.setKeywords(info.getKeywords());
-//                    arquivo.setModificationDate(info.getModificationDate().toString());
-                    arquivo.setProducer(info.getProducer());
-                    arquivo.setSubject(info.getSubject());
-                    arquivo.setTitle(info.getTitle());
-                    arquivo.setTrapped(info.getTrapped());
-                }
-
                 arquivo = persist(arquivo);
 
-                for (int i = 1; i <= pd.getNumberOfPages(); i++) {
+                for (int i = 0; i < pd.getNumberOfPages(); i++) {
 
                     Pagina pagina = new Pagina();
                     pagina.setArquivo(arquivo);
@@ -165,10 +128,16 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
                     for (COSName c : pdResources.getXObjectNames()) {
                         PDXObject o = pdResources.getXObject(c);
                         if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
-                            File file = new File("/opt/appfiles/img/" + namefile + "-" + i + ".png");
-                            ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) o).getImage(), "png", file);
-                            texto = texto + " " + itt.syncRecognizeFile("/opt/appfiles/img/" + namefile + "-" + i + ".png");
-                            FileUtils.write(new File("/opt/appfiles/img/" + namefile + "-" + i + ".txt"), texto);
+                            byte[] imageInByte;
+                            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                                ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) o).getImage(), "jpg", baos);
+                                baos.flush();
+                                imageInByte = baos.toByteArray();
+                            }
+                            if (imageInByte.length > 0) {
+                                //texto = texto + " " + itt.syncRecognizeFile(imageInByte);
+                            }
+
                         }
                     }
 
@@ -183,8 +152,8 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
                 LOG.log(Level.INFO, "{0} *********** PROCESSADO ************", arquivo.getDescription());
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(ArquivoDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(ArquivoDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -209,12 +178,12 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         if (nome.split(" ").length > 1) {
             luceneQuery = qb.phrase()
                     .onField("description")
-                    .andField("texto").boostedTo(2)
+                    .andField("texto")
                     .sentence(nome).createQuery();
         } else {
             luceneQuery = qb.keyword()
                     .onField("description")
-                    .andField("texto").boostedTo(2)
+                    .andField("texto")
                     .matching(nome).createQuery();
         }
 
@@ -223,13 +192,15 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
         fullTextQuery.setSort(Sort.RELEVANCE).getResultList().forEach((object) -> {
             try {
-                StringBuilder sb = new StringBuilder();
+
                 Float score = (Float) ((Object[]) object)[0];
                 Pagina pagina = (Pagina) ((Object[]) object)[1];
+
                 if (pagina != null) {
                     ResponseFTS fts = new ResponseFTS();
                     fts.setPagina(pagina);
                     fts.setOcorrencias(score);
+
                     lista.add(fts);
                 }
             } catch (Exception ex) {
@@ -257,4 +228,12 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         return lista.isEmpty();
     }
 
+//    private String getHighlightedField(Query query, Analyzer analyzer, String fieldName, String fieldValue) throws IOException, InvalidTokenOffsetsException {
+//        Formatter formatter = new SimpleHTMLFormatter("<span class=\"\">", "</span >");
+//        QueryScorer queryScorer = new QueryScorer(query);
+//        Highlighter highlighter = new Highlighter(formatter, queryScorer);
+//        highlighter.setTextFragmenter(new SimpleSpanFragmenter(queryScorer, Integer.MAX_VALUE));
+//        highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
+//        return highlighter.getBestFragment(analyzer, fieldName, fieldValue);
+//    }
 }

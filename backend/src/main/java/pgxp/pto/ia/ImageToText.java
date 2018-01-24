@@ -39,7 +39,7 @@ import java.util.List;
 
 public class ImageToText {
 
-    public String syncRecognizeFile(String fileName) throws Exception, IOException {
+    public String syncRecognizeFile(byte[] data) throws Exception, IOException {
 
         StringBuilder resultado = new StringBuilder();
         InputStream credentialsStream = new FileInputStream("/opt/demoiselle/google.json");
@@ -56,8 +56,8 @@ public class ImageToText {
             // The path to the image file to annotate
             //String fileName = "./resources/wakeupcat.jpg";
             // Reads the image file into memory
-            Path path = Paths.get(fileName);
-            byte[] data = Files.readAllBytes(path);
+            //Path path = Paths.get(fileName);
+            //byte[] data = Files.readAllBytes(path);
             ByteString imgBytes = ByteString.copyFrom(data);
 
             // Builds the image annotation request
