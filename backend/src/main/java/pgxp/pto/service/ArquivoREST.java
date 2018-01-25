@@ -47,8 +47,7 @@ public class ArquivoREST extends AbstractREST< Arquivo, UUID> {
     }
 
     private Response doSalvarAnexo(MultipartFormDataInput input) {
-        ((ArquivoBC) bc).salvarAnexo(input);
-        return Response.ok().build();
+        return Response.ok().entity(((ArquivoBC) bc).salvarAnexo(input)).build();
     }
 
     @GET

@@ -1,11 +1,14 @@
 package pgxp.pto.dao;
 
+import com.google.api.client.util.ArrayMap;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import pgxp.pto.entity.Arquivo;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -35,6 +38,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import pgxp.pto.constants.ResponseFTS;
 import pgxp.pto.entity.Entidades;
 import pgxp.pto.entity.Pagina;
+import pgxp.pto.ia.AnalyzeText;
 import pgxp.pto.ia.ImageToText;
 import pgxp.pto.ia.NLPtools;
 
@@ -52,6 +56,9 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
     private ImageToText itt;
 
     @Inject
+    private AnalyzeText at;
+
+    @Inject
     private NLPtools nlp;
 
     @PersistenceContext(unitName = "ptoPU")
@@ -62,8 +69,8 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         return em;
     }
 
-    public void salvarAnexo(MultipartFormDataInput input) {
-
+    public Arquivo salvarAnexo(MultipartFormDataInput input) {
+        Arquivo arquivo = new Arquivo();
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
         List<InputPart> inputParts = uploadForm.get("file");
 
@@ -80,7 +87,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
                 InputStream inputStream = inputPart.getBody(InputStream.class, null);
 
-                ler(inputStream, fileName);
+                arquivo = ler(inputStream, fileName);
 
             } catch (IOException e) {
                 throw new InternalServerErrorException(
@@ -88,7 +95,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
             }
 
         }
-
+        return arquivo;
     }
 
     private String getFileName(MultivaluedMap<String, String> header) {
@@ -103,14 +110,13 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         return "unknown";
     }
 
-    private void ler(InputStream inputStream, String namefile) {
-
+    private Arquivo ler(InputStream inputStream, String namefile) {
+        Arquivo arquivo = new Arquivo();
         try {
             if (verifica(namefile)) {
                 LOG.log(Level.INFO, "{0} *********** Inicio ************", namefile);
                 PDDocument pd;
                 pd = PDDocument.load(inputStream);
-                Arquivo arquivo = new Arquivo();
                 arquivo.setDescription(namefile);
                 arquivo = persist(arquivo);
 
@@ -118,7 +124,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
 
                     Pagina pagina = new Pagina();
                     pagina.setArquivo(arquivo);
-                    pagina.setDescription("Página " + i);
+                    pagina.setDescription("Página " + (i + 1));
                     PDFTextStripper stripper = new PDFTextStripper();
                     stripper.setStartPage(i);
                     stripper.setEndPage(i);
@@ -135,14 +141,17 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
                                 imageInByte = baos.toByteArray();
                             }
                             if (imageInByte.length > 0) {
-                                //texto = texto + " " + itt.syncRecognizeFile(imageInByte);
+                                texto = texto + " " + itt.syncRecognizeFile(imageInByte);
                             }
 
                         }
                     }
 
                     pagina.setTexto(texto);
-                    Entidades ents = new Entidades(nlp.persons(texto));
+                    Map<String, String> nlpResult = new ArrayMap<>();
+                    nlpResult.putAll(nlp.persons(texto));
+                    //nlpResult.putAll(at.analyzeEntitiesText(texto));
+                    Entidades ents = new Entidades(nlpResult);
                     ents = entidadesDAO.persist(ents);
                     pagina.setEntidades(ents);
                     paginaDAO.persist(pagina);
@@ -157,6 +166,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         } catch (Exception ex) {
             Logger.getLogger(ArquivoDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return arquivo;
     }
 
     /**
@@ -228,12 +238,4 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         return lista.isEmpty();
     }
 
-//    private String getHighlightedField(Query query, Analyzer analyzer, String fieldName, String fieldValue) throws IOException, InvalidTokenOffsetsException {
-//        Formatter formatter = new SimpleHTMLFormatter("<span class=\"\">", "</span >");
-//        QueryScorer queryScorer = new QueryScorer(query);
-//        Highlighter highlighter = new Highlighter(formatter, queryScorer);
-//        highlighter.setTextFragmenter(new SimpleSpanFragmenter(queryScorer, Integer.MAX_VALUE));
-//        highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
-//        return highlighter.getBestFragment(analyzer, fieldName, fieldValue);
-//    }
 }

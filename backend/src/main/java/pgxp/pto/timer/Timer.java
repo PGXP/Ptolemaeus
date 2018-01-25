@@ -37,7 +37,7 @@ public class Timer {
     @Transactional
     @Schedule(second = "0", minute = "0", hour = "*/1", persistent = false)
     public void atSchedule1h() {
-
+        arquivoDAO.reindex();
     }
 
     /**

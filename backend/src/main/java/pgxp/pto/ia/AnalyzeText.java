@@ -36,7 +36,6 @@ import com.google.cloud.language.v1.LanguageServiceClient;
 import com.google.cloud.language.v1.LanguageServiceSettings;
 import com.google.cloud.language.v1.Sentiment;
 import com.google.cloud.language.v1.Token;
-import com.google.cloud.speech.v1.SpeechSettings;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -53,10 +52,18 @@ public class AnalyzeText {
     /**
      * Identifies entities in the string {@code text}.
      */
-    public List<Entity> analyzeEntitiesText(String text) throws Exception {
-        // [START analyze_entities_text]
-        // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
-        try (LanguageServiceClient language = LanguageServiceClient.create()) {
+    public Map<String, String> analyzeEntitiesText(String text) throws Exception {
+        Map<String, String> nlpResult = new HashMap<>();
+        InputStream credentialsStream = new FileInputStream("/opt/demoiselle/google.json");
+        GoogleCredentials credentials = GoogleCredentials.fromStream(credentialsStream);
+        FixedCredentialsProvider credentialsProvider = FixedCredentialsProvider.create(credentials);
+
+        LanguageServiceSettings languageSettings
+                = LanguageServiceSettings.newBuilder()
+                        .setCredentialsProvider(credentialsProvider)
+                        .build();
+
+        try (LanguageServiceClient language = LanguageServiceClient.create(languageSettings)) {
             Document doc = Document.newBuilder()
                     .setContent(text)
                     .setType(Type.PLAIN_TEXT)
@@ -69,20 +76,10 @@ public class AnalyzeText {
             AnalyzeEntitiesResponse response = language.analyzeEntities(request);
 
             // Print the response
-            for (Entity entity : response.getEntitiesList()) {
-                System.out.printf("Entity: %s", entity.getName());
-                System.out.printf("Salience: %.3f\n", entity.getSalience());
-                System.out.println("Metadata: ");
-                for (Map.Entry<String, String> entry : entity.getMetadataMap().entrySet()) {
-                    System.out.printf("%s : %s", entry.getKey(), entry.getValue());
-                }
-                for (EntityMention mention : entity.getMentionsList()) {
-                    System.out.printf("Begin offset: %d\n", mention.getText().getBeginOffset());
-                    System.out.printf("Content: %s\n", mention.getText().getContent());
-                    System.out.printf("Type: %s\n\n", mention.getType());
-                }
-            }
-            return response.getEntitiesList();
+            response.getEntitiesList().forEach((entity) -> {
+                nlpResult.put(entity.getName(), entity.getType().name());
+            });
+            return nlpResult;
         }
         // [END analyze_entities_text]
 

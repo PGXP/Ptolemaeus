@@ -42,25 +42,32 @@ public class Entidades implements Serializable {
     private UUID id;
 
     @Column(length = 2560)
-    private String persons;
+    private String persons = "";
     @Column(length = 2560)
-    private String organizations;
+    private String organizations = "";
     @Column(length = 2560)
-    private String groups;
+    private String groups = "";
     @Column(length = 2560)
-    private String places;
+    private String places = "";
     @Column(length = 2560)
-    private String events;
+    private String events = "";
     @Column(length = 2560)
-    private String artprods;
+    private String artprods = "";
     @Column(length = 2560)
-    private String abstracts;
+    private String abstracts = "";
     @Column(length = 2560)
-    private String things;
+    private String things = "";
     @Column(length = 2560)
-    private String times;
+    private String times = "";
     @Column(length = 2560)
-    private String numerics;
+    private String numerics = "";
+
+    @Column(length = 2560)
+    private String unknowns = "";
+    @Column(length = 2560)
+    private String consumerGoods = "";
+    @Column(length = 2560)
+    private String other = "";
 
     public Entidades() {
     }
@@ -157,42 +164,69 @@ public class Entidades implements Serializable {
         this.numerics = numerics;
     }
 
+    public String getUnknowns() {
+        return unknowns;
+    }
+
+    public void setUnknowns(String unknowns) {
+        this.unknowns = unknowns;
+    }
+
+    public String getConsumerGoods() {
+        return consumerGoods;
+    }
+
+    public void setConsumerGoods(String consumerGoods) {
+        this.consumerGoods = consumerGoods;
+    }
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
+    }
+
     private void carregar(Map<String, String> mapa) {
         mapa.entrySet().forEach((entry) -> {
             String key = entry.getKey();
             String value = entry.getValue();
-            if (value.contains("person")) {
-                persons = persons + ";" + key;
+            if (value.toLowerCase().contains("person")) {
+                persons = key + ";" + persons;
             }
-            if (value.contains("organization")) {
-                organizations = organizations + ";" + key;
+            if (value.toLowerCase().contains("organization")) {
+                organizations = key + ";" + organizations;
             }
-            if (value.contains("group")) {
-                groups = groups + ";" + key;
+            if (value.toLowerCase().contains("group")) {
+                groups = key + ";" + groups;
             }
-            if (value.contains("place")) {
-                places = places + ";" + key;
+            if (value.toLowerCase().contains("event")) {
+                events = key + ";" + events;
             }
-            if (value.contains("event")) {
-                events = events + ";" + key;
+            if (value.toLowerCase().contains("place") || value.toLowerCase().contains("location")) {
+                places = key + ";" + places;
             }
-            if (value.contains("place")) {
-                places = places + ";" + key;
+            if (value.toLowerCase().contains("artprod") || value.toLowerCase().contains("work_of_art")) {
+                artprods = key + ";" + artprods;
             }
-            if (value.contains("artprod")) {
-                artprods = artprods + ";" + key;
+            if (value.toLowerCase().contains("abstract")) {
+                abstracts = key + ";" + abstracts;
             }
-            if (value.contains("abstract")) {
-                abstracts = abstracts + ";" + key;
+            if (value.toLowerCase().contains("thing") || value.toLowerCase().contains("other")) {
+                things = key + ";" + things;
             }
-            if (value.contains("thing")) {
-                things = things + ";" + key;
+            if (value.toLowerCase().contains("time")) {
+                times = key + ";" + times;
             }
-            if (value.contains("time")) {
-                times = times + ";" + key;
+            if (value.toLowerCase().contains("numeric")) {
+                numerics = key + ";" + numerics;
             }
-            if (value.contains("numeric")) {
-                numerics = numerics + ";" + key;
+            if (value.toLowerCase().contains("consumer_good")) {
+                consumerGoods = key + ";" + consumerGoods;
+            }
+            if (value.toLowerCase().contains("unknown")) {
+                unknowns = key + ";" + unknowns;
             }
         });
 

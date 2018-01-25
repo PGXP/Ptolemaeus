@@ -5,6 +5,7 @@
  */
 package pgxp.pto.ia;
 
+import com.google.api.client.util.ArrayMap;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,12 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import opennlp.tools.doccat.DoccatModel;
-import opennlp.tools.doccat.DocumentCategorizer;
-import opennlp.tools.doccat.DocumentCategorizerME;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.postag.POSModel;
@@ -33,7 +30,7 @@ import opennlp.tools.util.Span;
  *
  * @author PauloGladson
  */
-// http://www.linguateca.pt/Floresta/material.html
+// http://www.linguateca.pt/Floresta/corpus.html
 // baixar arquivo em http://opennlp.sourceforge.net/models-1.5/
 public class NLPtools {
 
@@ -42,7 +39,7 @@ public class NLPtools {
     public Map<String, String> persons(String texto) {
         Map<String, String> resultado = new HashMap<>();
 
-        try (InputStream modelPerson = new FileInputStream(pasta + "pt-ner-selva-lit.bin")) {
+        try (InputStream modelPerson = new FileInputStream(pasta + "pt-ner-selvaresta.bin")) {
 
             String tokens[] = tokenizer(texto).toArray(new String[tokenizer(texto).size()]);
             TokenNameFinderModel model = new TokenNameFinderModel(modelPerson);
@@ -56,26 +53,6 @@ public class NLPtools {
                 }
                 resultado.put(nome, nameSpan.toString());
             }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(NLPtools.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(NLPtools.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return resultado;
-    }
-
-    public Map<String, String> category(String texto) {
-        Map<String, String> resultado = new HashMap<>();
-
-        try (InputStream modelClassifier = new FileInputStream(pasta + "pt-livros-biblia-classifier-maxent.bin")) {
-
-            String tokens[] = tokenizer(texto).toArray(new String[tokenizer(texto).size()]);
-            DoccatModel model = new DoccatModel(modelClassifier);
-            DocumentCategorizer doccat = new DocumentCategorizerME(model);
-            double[] aProbs = doccat.categorize(tokens);
-            resultado.put(doccat.getBestCategory(aProbs), "Livro sugerido");
-
         } catch (FileNotFoundException ex) {
             Logger.getLogger(NLPtools.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -124,7 +101,7 @@ public class NLPtools {
     }
 
     public Map<String, String> POSTaggerMaxent(String texto) {
-        Map<String, String> resultado = new HashMap<>();
+        Map<String, String> resultado = new ArrayMap<>();
 
         try (InputStream modelPOSmaxent = new FileInputStream(pasta + "pt-pos-maxent.bin")) {
 
@@ -144,7 +121,7 @@ public class NLPtools {
     }
 
     public Map<String, String> POSTaggerPerceptron(String texto) {
-        Map<String, String> resultado = new HashMap<>();
+        Map<String, String> resultado = new ArrayMap<>();
 
         try (InputStream modelPOSperceptron = new FileInputStream(pasta + "pt-pos-perceptron.bin")) {
             String tokens[] = tokenizer(texto).toArray(new String[tokenizer(texto).size()]);

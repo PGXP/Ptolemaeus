@@ -11,8 +11,8 @@ import pgxp.pto.entity.Arquivo;
 
 public class ArquivoBC extends AbstractBusiness< Arquivo, UUID> {
 
-    public void salvarAnexo(MultipartFormDataInput input) {
-        ((ArquivoDAO) dao).salvarAnexo(input);
+    public Arquivo salvarAnexo(MultipartFormDataInput input) {
+        return ((ArquivoDAO) dao).salvarAnexo(input);
     }
 
     public List<ResponseFTS> listarFTS(String nome) {
