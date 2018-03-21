@@ -12,16 +12,14 @@
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   <!-- build:css(.) styles/vendor.css -->
   <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-  <link href="bower_components/admin-lte/dist/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css" />
-  <link href="bower_components/admin-lte/dist/css/AdminLTE.css" rel="stylesheet" type="text/css" />
   <!-- bower:css -->
   <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css" />
-  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+  <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.css" />
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css(.tmp) styles/animate.css -->
-  <link rel="stylesheet" href="styles/animate.css">
-  <link rel="stylesheet" href="styles/table.css">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/simple-line-icons.css">
   <!-- endbuild -->
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -32,101 +30,109 @@
         <![endif]-->
 </head>
 
-<body class="skin-blue sidebar-mini animated" ng-controller="ApplicationController">
-  <div class="wrapper">
+<body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+  <header class="app-header navbar">
+    <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <ul class="nav navbar-nav d-md-down-none">
+      <li class="nav-item px-3">
+        <a class="nav-link" href="#">Dashboard</a>
+      </li>
 
-    <!-- Main Header -->
-    <header class="main-header">
-
-      <!-- Logo -->
-      <a href="#dashboard" class="logo uil-ring-anim">
-        <span loading-indicator></span>
-        <!-- mini logo for sidebar mini 50x50 pixels -->
-        <span class="logo-mini ">
-          <b>
-            <i class='fa fa-eye'></i>
-          </b>
-        </span>
-        <!-- logo for regular state and mobile devices -->
-        <small>
-
-          <span class="logo-lg">
-            <i class='fa fa-eye'></i> Ptolemaeus</span>
-        </small>
-
-      </a>
-
-
-      <!-- Header Navbar -->
-      <nav class="navbar navbar-static-top" role="navigation">
-        <!-- Sidebar toggle button-->
-        <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-          <span class="sr-only">Navegador</span>
+    </ul>
+    <ul class="nav navbar-nav ml-auto">
+      <li class="nav-item d-md-down-none">
+        <a class="nav-link" href="#">
+          <i class="icon-bell"></i>
+          <span class="badge badge-pill badge-danger">5</span>
         </a>
-
-        <!-- Navbar Right Menu -->
-        <div class="navbar-custom-menu" ng-controller="AuthController">
-          <ul class="nav navbar-nav">
-            <!-- Messages: style can be found in dropdown.less-->
-
-            <!-- User Account Menu -->
-            <li class="dropdown user user-menu">
-              <!-- Menu Toggle Button -->
-              <a href="#dashboard" class="dropdown-toggle" data-toggle="dropdown">
-
-                <!-- The user image in the navbar-->
-                <!--<img src="images/photo.jpg" class="user-image" alt="User Image"/>-->
-                <!-- hidden-xs hides the username on small devices so only the image appears. -->
-              </a>
-            </li>
-
-          </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
+        </a>
+        <div class="dropdown-menu dropdown-menu-right">
+          <div class="dropdown-header text-center">
+            <strong>Account</strong>
+          </div>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-bell-o"></i> Updates
+            <span class="badge badge-info">42</span>
+          </a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-envelope-o"></i> Messages
+            <span class="badge badge-success">42</span>
+          </a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-tasks"></i> Tasks
+            <span class="badge badge-danger">42</span>
+          </a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-comments"></i> Comments
+            <span class="badge badge-warning">42</span>
+          </a>
+          <div class="dropdown-header text-center">
+            <strong>Settings</strong>
+          </div>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-user"></i> Profile</a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-wrench"></i> Settings</a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-usd"></i> Payments
+            <span class="badge badge-secondary">42</span>
+          </a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-file"></i> Projects
+            <span class="badge badge-primary">42</span>
+          </a>
+          <div class="divider"></div>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-shield"></i> Lock Account</a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-lock"></i> Logout</a>
         </div>
-      </nav>
-    </header>
-
-    <!-- Left side column. contains the logo and sidebar -->
-    <aside class="main-sidebar">
-
-      <!-- sidebar: style can be found in sidebar.less -->
-      <section class="sidebar">
-
-        <!-- Sidebar Menu -->
-        <ul class="sidebar-menu animated fadeInDown">
-          <li>
-            <a href="#dashboard">
-              <i class='fa fa-dashboard'></i>
-              <span>Geral</span>
+      </li>
+    </ul>
+    <button class="navbar-toggler aside-menu-toggler" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </header>
+  <div class="app-body">
+    <div class="sidebar">
+      <nav class="sidebar-nav">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <i class="icon-speedometer"></i> Dashboard
+              <span class="badge badge-primary">NEW</span>
             </a>
           </li>
-          <li>
-            <a href="#arquivos">
-              <i class='fa fa-book'></i>
-              <span>Arquivos</span>
-            </a>
+          <li class="nav-item">
+            <a href="colors.html" class="nav-link">
+              <i class="icon-drop"></i> Colors</a>
           </li>
         </ul>
-        <!-- /.sidebar-menu -->
-      </section>
-      <!-- /.sidebar -->
-    </aside>
-
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper animated fadeInUp">
-      <div ng-view="" class="animated fadeInUp"></div>
+      </nav>
     </div>
-    <!-- /.content-wrapper -->
 
-    <!-- Main Footer -->
-    <footer class="main-footer">
-      <div class="pull-right hidden-xs">
-      </div>
-      <!-- Default to the left -->
-      <strong>
-        <a href="https://github.com/PGXP">PGXP</a>.</strong>
-    </footer>
-
+    <main class="main" ng-view>
+    </main>
   </div>
+  <footer class="app-footer">
+    <span>
+      <a href="https://www.serpro.gov.br">SERPRO</a>
+    </span>
+    <span class="ml-auto">Powered by
+      <a href="https://coreui.io">CoreUI</a>
+    </span>
+  </footer>
+
   <!-- ./wrapper -->
   <!--<div ng-if="!currentUser" ng-include src="'views/login.html'" ></div>-->
 
@@ -138,7 +144,6 @@
   <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-  <script src="bower_components/admin-lte/dist/js/app.js"></script>
   <script src="bower_components/angular-animate/angular-animate.js"></script>
   <script src="bower_components/angular-aria/angular-aria.js"></script>
   <script src="bower_components/Chart.js/Chart.js"></script>
@@ -150,15 +155,19 @@
   <script src="bower_components/angular-route/angular-route.js"></script>
   <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
   <script src="bower_components/angular-touch/angular-touch.js"></script>
-  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+  <script src="bower_components/angular-breadcrumb/release/angular-breadcrumb.js"></script>
+  <script src="bower_components/angular-loading-bar/build/loading-bar.js"></script>
   <script src="bower_components/jquery-ui/jquery-ui.js"></script>
+  <script src="bower_components/tether/dist/js/tether.js"></script>
   <script src="bower_components/angular-notification/angular-notification.js"></script>
   <script src="bower_components/ng-websocket/ng-websocket.js"></script>
   <script src="bower_components/dat-gui/build/dat.gui.js"></script>
   <script src="bower_components/threejs/build/three.js"></script>
   <script src="bower_components/tracking/build/tracking.js"></script>
-  <script src="bower_components/ng-file-upload-shim/angular-file-upload-shim.js"></script>
   <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
+  <script src="bower_components/ng-file-upload-shim/ng-file-upload-shim.js"></script>
+  <script src="bower_components/angular-highlight-text/dist/angular-highlight-text.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
 
@@ -170,6 +179,7 @@
   <script src="/scripts/controllers/arquivos.js"></script>
   <script src="/scripts/controllers/auth.js"></script>
   <script src="/scripts/controllers/dashboard.js"></script>
+  <script src="/scripts/directives/coreui.js"></script>
   <script src="/scripts/directives/directives.js"></script>
   <script src="/scripts/filters/filters.js"></script>
   <script src="/scripts/services/alert.js"></script>

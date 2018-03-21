@@ -1,42 +1,57 @@
-<div class="painel painel-default animated fadeInUp">
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item">
+    <a href="#">Admin</a>
+  </li>
+  <li class="breadcrumb-item active">Dashboard</li>
 
-  <h3 class="page-header">
-    Pesquisa
-  </h3>
-  <div class="panel-body">
-    <div class="form-group row">
-      <input type="text" ng-model="texto">
-      <button ng-click="buscaFTS()">Buscar</button>
+  <li class="breadcrumb-menu d-md-down-none">
+    <div class="btn-group" role="group" aria-label="Button group">
+      <a class="btn" href="#">
+        <i class="icon-speech"></i>
+      </a>
+      <a class="btn" href="./">
+        <i class="icon-graph"></i> &nbsp;Dashboard</a>
+      <a class="btn" href="#">
+        <i class="icon-settings"></i> &nbsp;Settings</a>
     </div>
-  </div>
+  </li>
+</ol>
+<div class="container-fluid">
+  <div class="animated fadeIn">
 
-  <div class="panel panel-default  nga-default nga-stagger nga-squash-left" ng-repeat="r in resultados">
-    <div class="panel-body">
-      <div class="form-group row">
-        <div class="col-xs-11 col-sm-6 col-md-11">
-          {{r.pagina.arquivo.description}} - {{r.pagina.description}}
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <input type="text" ng-model="texto">
+            <button ng-click="buscaFTS()">Buscar</button>
+          </div>
+
+          <div class="col-sm-7 d-none d-md-block">
+            <div class="tab-pane" id="tab_2">
+              <p>abstracts: {{r.pagina.entidades.abstracts}}</p>
+              <p>artprods: {{r.pagina.entidades.artprods}}</p>
+              <p>consumerGoods : {{r.pagina.entidades.consumerGoods}}</p>
+              <p>events : {{r.pagina.entidades.events}}</p>
+              <p>groups : {{r.pagina.entidades.groups}}</p>
+              <p>numerics : {{r.pagina.entidades.numerics}}</p>
+              <p>organizations : {{r.pagina.entidades.organizations}}</p>
+              <p>other : {{r.pagina.entidades.other}}</p>
+              <p>persons : {{r.pagina.entidades.persons}}</p>
+              <p>places : {{r.pagina.entidades.places}}</p>
+              <p>things : {{r.pagina.entidades.things}}</p>
+              <p>times : {{r.pagina.entidades.times}}</p>
+              <p>unknowns : {{r.pagina.entidades.unknowns}}</p>
+            </div>
+
+          </div>
+
         </div>
+
       </div>
-      <div class="form-group row">
-        <div class="col-xs-7 col-sm-7 col-md-7">
-          <textarea cols="80" rows="20">{{r.pagina.texto}}</textarea>
-        </div>
-        <div class="col-xs-5 col-sm-5 col-md-5">
-          <p>abstracts: {{r.pagina.entidades.abstracts}}</p>
-          <p>artprods: {{r.pagina.entidades.artprods}}</p>
-          <p>consumerGoods : {{r.pagina.entidades.consumerGoods}}</p>
-          <p>events : {{r.pagina.entidades.events}}</p>
-          <p>groups : {{r.pagina.entidades.groups}}</p>
-          <p>numerics : {{r.pagina.entidades.numerics}}</p>
-          <p>organizations : {{r.pagina.entidades.organizations}}</p>
-          <p>other : {{r.pagina.entidades.other}}</p>
-          <p>persons : {{r.pagina.entidades.persons}}</p>
-          <p>places : {{r.pagina.entidades.places}}</p>
-          <p>things : {{r.pagina.entidades.things}}</p>
-          <p>times : {{r.pagina.entidades.times}}</p>
-          <p>unknowns : {{r.pagina.entidades.unknowns}}</p>
-        </div>
-      </div>
+
     </div>
+
   </div>
 </div>

@@ -44,9 +44,10 @@ public class Timer {
      *
      */
     @Transactional
-    @Schedule(second = "0", minute = "*/1", hour = "*", persistent = false)
-    public void atSchedule1m() {
+    @Schedule(second = "33", minute = "*/5", hour = "*", persistent = false)
+    public void atSchedule5m() {
         //LOG.info("atSchedule1m");
+        
     }
 
     /**

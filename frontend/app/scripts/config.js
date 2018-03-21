@@ -1,5 +1,5 @@
 angular.module('Config', [])
 
-.constant('ENV', {name:'production',apiEndpoint:'/pto/'})
+.constant('ENV', {name:'development',apiEndpoint:'http://localhost:8080/pto/'})
 
 ;

@@ -15,6 +15,9 @@ var app = angular
     'notification',
     'ngWebsocket',
     'ngFileUpload',
+    'ncy-angular-breadcrumb',
+    'angular-loading-bar',
+    'angular-highlight-text',
     'Config'
   ])
   .config([
@@ -22,7 +25,6 @@ var app = angular
     '$httpProvider',
     'USER_ROLES',
     function($routeProvider, USER_ROLES) {
-
       $routeProvider.when('/403', {
         templateUrl: 'views/403.html',
         data: { authorizedRoles: [USER_ROLES.NOT_LOGGED] }
