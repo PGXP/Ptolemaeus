@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Fingerprint.findAll", query = "SELECT f FROM Fingerprint f")
-    , @NamedQuery(name = "Fingerprint.findByCodigo", query = "SELECT f FROM Fingerprint f WHERE f.codigo = :codigo")
+    , @NamedQuery(name = "Fingerprint.findByEndpoint", query = "SELECT f FROM Fingerprint f WHERE f.endpoint = :endpoint")
     , @NamedQuery(name = "Fingerprint.findByUsuario", query = "SELECT f FROM Fingerprint f WHERE f.usuario = :usuario")
     , @NamedQuery(name = "Fingerprint.findById", query = "SELECT f FROM Fingerprint f WHERE f.id = :id")})
 public class Fingerprint implements Serializable {
@@ -32,10 +32,14 @@ public class Fingerprint implements Serializable {
     private static final long serialVersionUID = 1L;
     @Size(max = 8196)
     @Column(length = 8196)
-    private String codigo;
+    private String endpoint;
 
-    @Size(max = 8196)
-    @Column(length = 8196)
+    private String expirationTime;
+    private String auth;
+    private String p256dh;
+
+    @Size(max = 256)
+    @Column(length = 256)
     private String usuario;
 
     @Id
@@ -51,12 +55,36 @@ public class Fingerprint implements Serializable {
         this.id = id;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getEndpoint() {
+        return endpoint;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public String getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(String expirationTime) {
+        this.expirationTime = expirationTime;
+    }
+
+    public String getAuth() {
+        return auth;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
+    }
+
+    public String getP256dh() {
+        return p256dh;
+    }
+
+    public void setP256dh(String p256dh) {
+        this.p256dh = p256dh;
     }
 
     public String getUsuario() {

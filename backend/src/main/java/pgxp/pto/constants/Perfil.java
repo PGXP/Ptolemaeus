@@ -4,10 +4,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public enum Perfil {
-    
+
     ADMINISTRADOR("Administrador"),
-    GERENTE("Gerente"),
-    USUARIO("Usuário");
+    VISITANTE("Visitante");
 
     private final String value;
 
@@ -18,7 +17,7 @@ public enum Perfil {
     public String getValue() {
         return this.value;
     }
-    
+
     @Override
     public String toString() {
         return this.value;

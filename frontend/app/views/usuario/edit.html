@@ -1,0 +1,82 @@
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item active">Usuário</li>
+  <li class="breadcrumb-menu d-md-down-none">
+      <div class="btn-group" role="group" aria-label="Button group">
+          <a class="btn" href="#">
+              <i class="icon-speech"></i> Ajuda
+          </a>
+      </div>
+  </li>
+</ol>
+<div class="container-fluid">
+  <div class="animated fadeIn">
+      <div class="card">
+          <div class="card-header">
+              <button class="btn btn-default" type="button" back-button>
+                  <i class="icon-arrow-left-circle"> </i> Voltar
+              </button>
+          </div>
+          <div class="card-body">
+              <div class="form-group row">
+                  <div class="col-md-1">
+                      <img ng-src="{{usuario.foto}}" class="avatar-view">
+                  </div>
+                  <div class="col-md-6">
+                      <label>Email </label>
+
+                      <input type="email" class="form-control" ng-required="true" ng-model="usuario.email">
+                      <span class="input-group-btn" ng-show="!usuario.id">
+                          <button class="btn btn-primary" type="button" ng-click="searchByEmail()">
+                              <i class="icon-magnifier"></i>
+                          </button>
+                      </span>
+                      <validation-msg propriedade="usuario.email"></validation-msg>
+                  </div>
+
+              </div>
+
+
+              <div class="form-group row">
+                  <div class="col-md-7">
+                      <label>Nome </label>
+                      <input type="text" class="form-control" ng-model="usuario.fullname">
+                      <validation-msg propriedade="usuario.fullname"></validation-msg>
+                  </div>
+                  <div class="col-md-3" has-roles="Administrador,Sindico">
+                      <label>Perfil</label>
+                      <p class="input-group">
+                          <select class="form-control" ng-model="usuario.perfil" ng-options="item as item for item in perfils"></select>
+                          <validation-msg propriedade="usuario.perfil"></validation-msg>
+                      </p>
+                  </div>
+
+              </div>
+
+
+
+              <div class="form-group row">
+                  <div class="col-md-4">
+                      <label class="switch switch-default switch-primary">
+                          <input type="checkbox" class="switch-input" ng-model="usuario.notificaMovimento">
+                          <span class="switch-label"></span>
+                          <span class="switch-handle"></span>
+                      </label>
+                      Receber Notificação
+                      <validation-msg propriedade="unidade.pet"></validation-msg>
+                  </div>
+
+              </div>
+
+          </div>
+          <div class="card-footer" has-roles="Administrador,Sindico">
+              <button class="btn btn-danger" ng-bootbox-confirm="Confirma a remoção?" ng-bootbox-confirm-action="delete()" type="button">
+                  <i class="icon-close"> </i> Remover
+              </button>
+              <button class="btn btn-primary" ng-click="save()" type="button">
+                  <i class="icon-check"> </i> Salvar
+              </button>
+          </div>
+      </div>
+  </div>
+</div>

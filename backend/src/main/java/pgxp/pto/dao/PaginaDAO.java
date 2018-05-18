@@ -18,7 +18,7 @@ public class PaginaDAO extends AbstractDAO< Pagina, UUID> {
 
     private static final Logger LOG = getLogger(PaginaDAO.class.getName());
 
-    @PersistenceContext(unitName = "ptoPU")
+    @PersistenceContext
     protected EntityManager em;
 
     @Override

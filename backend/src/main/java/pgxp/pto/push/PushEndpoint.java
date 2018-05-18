@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import static java.util.logging.Level.FINE;
@@ -20,7 +19,6 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import pgxp.pto.dao.UserDAO;
-import pgxp.pto.entity.User;
 
 /**
  *
@@ -47,18 +45,18 @@ public class PushEndpoint {
 
         if (message.getEvent().equalsIgnoreCase("login")) {
             if (message.getData() != null && !message.getData().isEmpty()) {
-                User usu = dao.find(message.getData());
-                if (usu != null) {
-                    session.getUserProperties().putIfAbsent("id", usu.getId().toString());
-                    session.getUserProperties().putIfAbsent("name", usu.getDescription());
-                    session.getUserProperties().putIfAbsent("role", usu.getPerfil().toString());
-                    session.getUserProperties().putIfAbsent("email", usu.getEmail());
-                    PushMessage mm = new PushMessage("list", new Gson().toJson(listUsers(channel)));
-                    sendTo(new Gson().toJson(mm), channel);
-                    mm = new PushMessage("count", count());
-                    sendTo(new Gson().toJson(mm), channel);
-                    logger.log(FINE, "Logged - ", message.getData());
-                }
+//                User usu = dao.find(message.getData());
+//                if (usu != null) {
+//                    session.getUserProperties().putIfAbsent("id", usu.getId().toString());
+//                    session.getUserProperties().putIfAbsent("name", usu.getDescription());
+//                    session.getUserProperties().putIfAbsent("role", usu.getPerfil().toString());
+//                    session.getUserProperties().putIfAbsent("email", usu.getEmail());
+//                    PushMessage mm = new PushMessage("list", new Gson().toJson(listUsers(channel)));
+//                    sendTo(new Gson().toJson(mm), channel);
+//                    mm = new PushMessage("count", count());
+//                    sendTo(new Gson().toJson(mm), channel);
+//                    logger.log(FINE, "Logged - ", message.getData());
+//                }
 
             }
         }
@@ -150,7 +148,6 @@ public class PushEndpoint {
             }
         });
     }
-
 
     public void sendToSession(final String texto, final String sessionID) {
         peers.parallelStream().forEach((s) -> {

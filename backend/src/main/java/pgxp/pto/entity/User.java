@@ -1,6 +1,5 @@
 package pgxp.pto.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import pgxp.pto.constants.Perfil;
 import java.io.Serializable;
 import java.util.Objects;
@@ -12,11 +11,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.validator.constraints.Email;
 
+/**
+ *
+ * @author PauloGladson
+ */
 @Entity
 @Table(uniqueConstraints = {
     @UniqueConstraint(columnNames = {"email"})})
@@ -31,58 +34,33 @@ public class User implements Serializable {
 
     @NotNull
     @Basic(optional = false)
-    @Size(min = 3, max = 128)
-    @Column(nullable = false, length = 128)
-    private String description;
+    @Column(nullable = false)
+    private Perfil perfil;
 
-    @Email
     @NotNull
-    @Basic(optional = false)
-    @Size(min = 5, max = 128)
-    @Column(name = "email", nullable = false, length = 128, unique = true)
+    @Pattern(regexp = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message = "E-mail inválido")//if the field contains email address consider using this annotation to enforce field validation
+    @Size(max = 128)
+    @Column(length = 128, nullable = false)
     private String email;
 
     @NotNull
-    @Basic(optional = false)
-    @Size(min = 8, max = 128)
+    @Size(max = 128)
+    @Column(length = 128)
+    private String description;
+
+    @Column(name = "notifica")
+    private Boolean notifica;
+
+    @Size(max = 128)
     @Column(length = 128)
     private String pass;
 
-    @Size(max = 2048)
-    @Column(length = 2048)
+    @Size(max = 1024)
+    @Column(length = 1024)
     private String foto;
-
-    @Column
-    private Perfil perfil;
 
     public String getId() {
         return id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @JsonIgnore
-    public String getPass() {
-        return pass;
-    }
-
-    @JsonIgnore
-    public void setPass(String pass) {
-        this.pass = pass;
     }
 
     public Perfil getPerfil() {
@@ -93,6 +71,22 @@ public class User implements Serializable {
         this.perfil = perfil;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Boolean getNotifica() {
+        return notifica;
+    }
+
+    public void setNotifica(Boolean notifica) {
+        this.notifica = notifica;
+    }
+
     public String getFoto() {
         return foto;
     }
@@ -101,11 +95,26 @@ public class User implements Serializable {
         this.foto = foto;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 97 * hash + Objects.hashCode(this.id);
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -125,11 +134,6 @@ public class User implements Serializable {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" + "id=" + id + ", description=" + description + ", email=" + email + ", pass=" + pass + ", perfil=" + perfil + '}';
     }
 
 }

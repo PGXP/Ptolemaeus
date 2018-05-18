@@ -61,7 +61,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
     @Inject
     private NLPtools nlp;
 
-    @PersistenceContext(unitName = "ptoPU")
+    @PersistenceContext
     protected EntityManager em;
 
     @Override
@@ -110,7 +110,7 @@ public class ArquivoDAO extends AbstractDAO< Arquivo, UUID> {
         return "unknown";
     }
 
-    private Arquivo ler(InputStream inputStream, String namefile) {
+    public Arquivo ler(InputStream inputStream, String namefile) {
         Arquivo arquivo = new Arquivo();
         try {
             if (verifica(namefile)) {

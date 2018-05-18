@@ -21,7 +21,7 @@ public class EntidadesDAO extends AbstractDAO< Entidades, UUID> {
 
     private static final Logger LOG = getLogger(EntidadesDAO.class.getName());
 
-    @PersistenceContext(unitName = "ptoPU")
+    @PersistenceContext
     protected EntityManager em;
 
     @Override

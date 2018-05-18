@@ -1,6 +1,6 @@
 'use strict';
-app.controller('AuthController', ['$scope', '$rootScope', 'AUTH_EVENTS', 'AuthService', '$notification',
-    function ($scope, $rootScope, AUTH_EVENTS, AuthService, $notification) {
+app.controller('AuthController', ['$scope', '$rootScope', 'AUTH_EVENTS', 'AuthService',
+    function ($scope, $rootScope, AUTH_EVENTS, AuthService) {
 
         $scope.credentials = {
             username: '',

@@ -1,16 +1,17 @@
 {
   "name": "ptolemaeus",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "dependencies": {
-    "angular-chart.js": "^1.0.0-alpha8"
+    "angular-i18n": "^1.6.5",
+    "npm": "^5.4.2"
   },
-  "repository": {},
   "devDependencies": {
-    "bower": "^1.8.2",
+    "bower": "^1.7.7",
     "bower-nexus3-resolver": "*",
-    "grunt": "^0.4.1",
+    "grunt": "^1.0.1",
+    "grunt-angular-templates": "^1.1.0",
     "grunt-autoprefixer": "^0.7.3",
-    "grunt-cli": "^0.1.13",
+    "grunt-cli": "1.2.0",
     "grunt-concurrent": "^0.5.0",
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-concat": "^0.4.0",
@@ -29,7 +30,9 @@
     "grunt-newer": "^0.7.0",
     "grunt-ng-annotate": "^0.3.0",
     "grunt-ng-constant": "^1.1.0",
+    "grunt-sri": "^0.2.0",
     "grunt-svgmin": "^0.4.0",
+    "grunt-sw-precache": "^1.0.3",
     "grunt-usemin": "^2.1.1",
     "grunt-wiredep": "^1.7.0",
     "jshint-stylish": "^0.2.0",
@@ -38,8 +41,5 @@
   },
   "engines": {
     "node": ">=0.10.0"
-  },
-  "scripts": {
-    "test": "grunt test"
   }
 }

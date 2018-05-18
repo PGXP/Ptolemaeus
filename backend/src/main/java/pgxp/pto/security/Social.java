@@ -5,13 +5,14 @@ package pgxp.pto.security;
  * @author paulo
  */
 public class Social {
+
     private String email;
-    private String id;
     private String idToken;
-    private String image;
+    private String imageUrl;
     private String name;
     private String provider;
     private String token;
+    private String uid;
 
     public String getEmail() {
         return email;
@@ -29,12 +30,12 @@ public class Social {
         this.idToken = idToken;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getName() {
@@ -61,13 +62,12 @@ public class Social {
         this.token = token;
     }
 
-    public String getId() {
-        return id;
+    public String getUid() {
+        return uid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
-
 
 }

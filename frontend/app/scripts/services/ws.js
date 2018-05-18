@@ -1,44 +1,72 @@
 'use strict';
 
-app.factory('WS', ['$rootScope', '$websocket',
-    function ($rootScope, $websocket) {
-                                        var service = {};
+app.factory('WebSocket', ['$rootScope', '$websocket', 'AUTH_EVENTS', function ($rootScope, $websocket, AUTH_EVENTS) {
 
-                                        // var wsUrl;
+  var service = {};
 
-                                        // if (window.location.protocol == 'https:') {
-                                        //     wsUrl = 'wss://' + window.location.host + '/ws/echo';
-                                        // } else {
-                                        //     wsUrl = 'ws://' + 'ctcta.cetec.serpro' + '/ws/echo';
-                                        // }
+  if ('WebSocket' in window || 'MozWebSocket' in window) {
 
-                                        // var ws = $websocket.$new({
-                                        //     url: wsUrl, protocols: [], subprotocols: ['base46']
-                                        // });
+    var wsUrl = 'wss://app.condominiofacil.net/admin/push/cds';
 
-                                        // ws.$on('$open', function () {
-                                        //     console.log("WS ON");
-                                        //     if ($rootScope.currentUser) {
-                                        //         ws.$emit("login", $rootScope.currentUser.cpf);
-                                        //     }
-                                        // });
+    var ws = $websocket.$new({
+      url: wsUrl,
+      protocols: [],
+      subprotocols: ['base46'],
+      lazy: false,
+      reconnect: true,
+      reconnectInterval: 7777,
+      mock: false,
+      enqueue: false
+    });
 
-                                        // ws.$on('$close', function () {
-                                        //     console.log("WS OFF");
-                                        // });
+    ws.$on('$open', function () {
+      console.log("WS OPEN");
+      if ($rootScope.currentUser) {
+        ws.$emit("login", $rootScope.currentUser.identity);
+      }
+    });
 
-                                        // ws.$on('$error', function () {
-                                        //     console.log("WS ERROR");
-                                        // });
+    ws.$on('$close', function () {
+      console.log("WS CLOSE");
+    });
 
-                                        // ws.$on('$message', function (emit) {
-                                        //     $rootScope.$broadcast(emit.event, {emit: emit});
-                                        //     console.log(emit.event + " - " + emit.data);
-                                        // });
+    ws.$on('$error', function () {
+      console.log("WS ERROR");
+    });
 
-                                        // service.command = function (command, mensagem) {
-                                        //     ws.$emit(command, mensagem);
-                                        // };
+    ws.$on('$message', function (emit) {
+      $rootScope.$broadcast(emit.event, {
+        emit: emit
+      });
+    });
 
-                                        return service;
-                                      }]);
+    service.command = function (command, mensagem) {
+      ws.$emit(command, mensagem);
+    };
+
+    $rootScope.$on(AUTH_EVENTS.logoutSuccess, function () {
+      ws.$emit("logout", "");
+    });
+
+    $rootScope.$on(AUTH_EVENTS.loginSuccess, function () {
+      ws.$emit("login", $rootScope.currentUser.identity);
+    });
+
+    $rootScope.$on(AUTH_EVENTS.quantidade, function (emit, args) {
+      $rootScope.$apply(function () {
+        $rootScope.conectados = args.emit.data;
+      });
+    });
+
+    $rootScope.$on(AUTH_EVENTS.lista, function (emit, args) {
+      $rootScope.$apply(function () {
+        $rootScope.lista = JSON.parse(args.emit.data);
+      });
+    });
+
+  } else {
+    console.log("This browser doesn't support WebSocket");
+  }
+
+  return service;
+}]);
