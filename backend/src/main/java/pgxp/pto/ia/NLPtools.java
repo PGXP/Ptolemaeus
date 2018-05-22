@@ -59,23 +59,29 @@ public class NLPtools {
         ExecutorService executorGerador = newFixedThreadPool(MAX_THREADS);
 
         final Map<String, String> resultado = new ConcurrentHashMap<>();
-        String tokens[] = tokenizer(texto).toArray(new String[tokenizer(texto).size()]);
+        HashSet<String> sd = sentenceDetect(texto);
+        String sentences[] = sd.toArray(new String[sd.size()]);
         File folder = new File(config.getPathia());
         File[] listOfFiles = folder.listFiles((File dir, String name) -> name.contains("-ner"));
 
-        for (File listOfFile : listOfFiles) {
-            if (listOfFile.isFile()) {
-                ProcessorNameFinder pnf = new ProcessorNameFinder();
-                pnf.setPath(config.getPathia() + File.separator + listOfFile.getName());
-                pnf.setTokens(tokens);
-                pnf.setResultado(resultado);
-                executorGerador.submit(pnf);
+        for (String sentence : sentences) {
+            HashSet<String> tks = tokenizer(sentence);
+            String tokens[] = tks.toArray(new String[tks.size()]);
+            for (File listOfFile : listOfFiles) {
+                if (listOfFile.isFile()) {
+                    ProcessorNameFinder pnf = new ProcessorNameFinder();
+                    pnf.setPath(config.getPathia() + File.separator + listOfFile.getName());
+                    pnf.setTokens(tokens);
+                    pnf.setResultado(resultado);
+                    executorGerador.submit(pnf);
+                }
             }
         }
 
         executorGerador.shutdown();
+
         try {
-            executorGerador.awaitTermination(1, MINUTES);
+            executorGerador.awaitTermination(5, MINUTES);
         } catch (InterruptedException ie) {
             LOG.severe(ie.getLocalizedMessage());
         }

@@ -41,11 +41,7 @@ public class ProcessorNameFinder implements Runnable {
             Span[] nameSpans = finder.find(tokens);
 
             for (Span nameSpan : nameSpans) {
-                String nome = "";
-                for (int index = nameSpan.getStart(); index < nameSpan.getEnd(); index++) {
-                    nome = tokens[index] + " " + nome;
-                }
-                resultado.putIfAbsent(nome, nameSpan.toString());
+                resultado.putIfAbsent(tokens[nameSpan.getStart()], nameSpan.getType());
             }
 
         } catch (FileNotFoundException ex) {

@@ -56,7 +56,7 @@ public class Timer {
      *
      */
     @Transactional
-    @Schedule(second = "*/15", minute = "*", hour = "*", persistent = false)
+    @Schedule(second = "33", minute = "*/1", hour = "*", persistent = false)
     public void atSchedule5m() {
         if (!paginaDAO.listaNaoValidos().isEmpty()) {
             Pagina pag = paginaDAO.listaNaoValidos().get(0);
