@@ -1,9 +1,7 @@
 package pgxp.pto.constants;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.logging.Logger;
-import pgxp.pto.entity.Entidades;
 import pgxp.pto.entity.Pagina;
 
 public class ResponseFTS implements Serializable {

@@ -16,7 +16,8 @@ public class AdminConfig {
 
     private String vappub;
     private String vapprv;
-    private String path;
+    private String pathfile;
+    private String pathia;
 
     public String getVappub() {
         return vappub;
@@ -34,12 +35,20 @@ public class AdminConfig {
         this.vapprv = vapprv;
     }
 
-    public String getPath() {
-        return path;
+    public String getPathfile() {
+        return pathfile;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setPathfile(String pathfile) {
+        this.pathfile = pathfile;
+    }
+
+    public String getPathia() {
+        return pathia;
+    }
+
+    public void setPathia(String pathia) {
+        this.pathia = pathia;
     }
 
 }

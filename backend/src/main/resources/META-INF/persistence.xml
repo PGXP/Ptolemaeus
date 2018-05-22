@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-  <persistence-unit name="ptoPU" transaction-type="JTA">
-    <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    <jta-data-source>java:/jboss/datasources/ExampleDS</jta-data-source>
-    <class>pgxp.pto.entity.User</class>
-    <class>pgxp.pto.entity.Fingerprint</class>
-    <class>pgxp.pto.entity.Arquivo</class>
-    <class>pgxp.pto.entity.Pagina</class>
-    <class>pgxp.pto.entity.Entidades</class>
-    <class>pgxp.pto.entity.Mensagem</class>
-    <exclude-unlisted-classes>true</exclude-unlisted-classes>
-    <properties>
-      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-      <property name="hibernate.show_sql" value="false"/>
-      <property name="hibernate.format_sql" value="true"/>
-      <property name="hibernate.use_sql_coments" value="true"/>
-      <!--<property name="hibernate.generate_statistics" value="true" />-->
-      <!-- Infinispan -->
-      <property name="hibernate.cache.infinispan.statistics" value="true"/>
-      <property name="hibernate.cache.use_structured_entries" value="true"/>
-      <!-- 2LC -->
-      <property name="hibernate.cache.use_second_level_cache" value="true"/>
-      <property name="hibernate.cache.use_query_cache" value="true"/>
-      <!-- Hibenate Search (Apache Lucene) -->
-      <property name="hibernate.search.default.directory_provider" value="filesystem"/>
-      <property name="hibernate.search.default.worker.backend" value="jgroups"/>
-      <property name="hibernate.search.default.indexBase" value="$jboss.server.home.dir/data"/>
-      <property name="hibernate.search.reader.strategy" value="shared"/>
-      <property name="hibernate.search.worker.execution" value="async"/>
-    </properties>
-  </persistence-unit>
+    <persistence-unit name="ptoPU" transaction-type="JTA">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:/jboss/datasources/ExampleDS</jta-data-source>
+        <class>pgxp.pto.entity.User</class>
+        <class>pgxp.pto.entity.Fingerprint</class>
+        <class>pgxp.pto.entity.Arquivo</class>
+        <class>pgxp.pto.entity.Pagina</class>
+        <class>pgxp.pto.entity.Mensagem</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_coments" value="true"/>
+            <!--<property name="hibernate.generate_statistics" value="true" />-->
+            <!-- Infinispan -->
+            <property name="hibernate.cache.infinispan.statistics" value="true"/>
+            <property name="hibernate.cache.use_structured_entries" value="true"/>
+            <!-- 2LC -->
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <!-- Hibenate Search (Apache Lucene) -->
+            <property name="hibernate.search.default.directory_provider" value="filesystem"/>
+            <!--<property name="hibernate.search.default.worker.backend" value="jgroups"/>-->
+            <property name="hibernate.search.default.indexBase" value="$jboss.server.home.dir/data"/>
+            <property name="hibernate.search.reader.strategy" value="shared"/>
+            <property name="hibernate.search.worker.execution" value="async"/>
+        </properties>
+    </persistence-unit>
 </persistence>

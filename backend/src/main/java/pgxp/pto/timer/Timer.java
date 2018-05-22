@@ -1,9 +1,6 @@
 package pgxp.pto.timer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 import javax.ejb.Schedule;
@@ -15,6 +12,9 @@ import pgxp.pto.AdminConfig;
 import pgxp.pto.cloud.CloudSender;
 import pgxp.pto.dao.ArquivoDAO;
 import pgxp.pto.dao.FingerprintDAO;
+import pgxp.pto.dao.PaginaDAO;
+import pgxp.pto.entity.Pagina;
+import pgxp.pto.ia.NLPtools;
 
 /**
  *
@@ -35,25 +35,36 @@ public class Timer {
     private ArquivoDAO arquivoDAO;
 
     @Inject
+    private PaginaDAO paginaDAO;
+
+    @Inject
+    private NLPtools nlp;
+
+    @Inject
     private CloudSender sender;
 
     /**
      *
      */
     @Transactional
-    @Schedule(second = "0", minute = "0", hour = "*/3", persistent = false)
+    @Schedule(second = "0", minute = "5", hour = "*/5", persistent = false)
     public void atSchedule1h() {
-        arquivoDAO.reindex();
+
     }
 
     /**
      *
      */
     @Transactional
-    @Schedule(second = "33", minute = "*/5", hour = "*", persistent = false)
+    @Schedule(second = "*/15", minute = "*", hour = "*", persistent = false)
     public void atSchedule5m() {
-        //LOG.info("atSchedule1m");
-
+        if (!paginaDAO.listaNaoValidos().isEmpty()) {
+            Pagina pag = paginaDAO.listaNaoValidos().get(0);
+            Map<String, String> nlpResult = nlp.nameFinder(pag.getTexto());
+            pag.setValidado(Boolean.TRUE);
+            pag.carregar(nlpResult);
+            paginaDAO.mergeFull(pag);
+        }
     }
 
     /**
@@ -62,31 +73,16 @@ public class Timer {
     @Startup
     @Transactional
     public void atNow() {
-
-        File folder = new File(config.getPath());
-        File[] listOfFiles = folder.listFiles();
-
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                try {
-                    arquivoDAO.ler(new FileInputStream(listOfFiles[i]), listOfFiles[i].getName());
-                    System.out.println("File " + listOfFiles[i].getName());
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(Timer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-
-        arquivoDAO.reindex();
+        arquivoDAO.scan();
     }
 
     /**
      *
      */
     @Transactional
-    @Schedule(second = "0", minute = "0", hour = "9", persistent = false)
+    @Schedule(second = "7", minute = "7", hour = "7", persistent = false)
     public void atScheduleOneInDay() {
-        // LOG.info("atScheduleOneInDay");
+        arquivoDAO.reindex();
     }
 
 }

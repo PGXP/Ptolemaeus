@@ -19,4 +19,8 @@ public class ArquivoBC extends AbstractBusiness< Arquivo, UUID> {
         return ((ArquivoDAO) dao).listarFTS(nome);
     }
 
+    public List<String> scan() {
+        return ((ArquivoDAO) dao).scan();
+    }
+
 }

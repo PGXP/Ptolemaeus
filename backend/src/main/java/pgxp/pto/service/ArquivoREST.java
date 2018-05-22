@@ -30,7 +30,7 @@ public class ArquivoREST extends AbstractREST< Arquivo, UUID> {
     @GET
     @Override
     @Transactional
-    @Search(fields = {"id", "description"}, withPagination = false) // Escolha quais campos vão para o frontend Ex: {"id", "description"}
+    @Search(fields = {"*"}, withPagination = false) // Escolha quais campos vão para o frontend Ex: {"id", "description"}
     public Result find() {
         return bc.find();
     }
@@ -70,6 +70,17 @@ public class ArquivoREST extends AbstractREST< Arquivo, UUID> {
 
     private Response doDownload(@PathParam("id") Long id) {
         return Response.ok().build();
+    }
+
+    @GET
+    @Path(value = "scan")
+    @Transactional
+    public void scan(@Suspended final AsyncResponse asyncResponse) {
+        asyncResponse.resume(doScan());
+    }
+
+    private Response doScan() {
+        return Response.ok(((ArquivoBC) bc).scan()).build();
     }
 
 }

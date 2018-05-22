@@ -25,12 +25,11 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
 @Entity
-@Cacheable
 @DynamicInsert
 @DynamicUpdate
 @Indexed
 @XmlRootElement
-@Analyzer(impl = BrazilianAnalyzer.class)
+@Analyzer
 @Table(name = "arquivo")
 public class Arquivo implements Serializable {
 

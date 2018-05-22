@@ -26,4 +26,7 @@ public class PaginaDAO extends AbstractDAO< Pagina, UUID> {
         return em;
     }
 
+    public List<Pagina> listaNaoValidos() {
+        return getEntityManager().createNamedQuery("Pagina.findAll").getResultList();
+    }
 }
